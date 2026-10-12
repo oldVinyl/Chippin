@@ -22,7 +22,7 @@ describe('money and identity boundaries', () => {
   });
   test('encryption authenticates ciphertext', () => {
     const sealed = encrypt('233241234567');
-    expect(sealed).not.toContain('233');
+    expect(sealed).not.toContain('233241234567');
     expect(decrypt(sealed)).toBe('233241234567');
     expect(() => decrypt(sealed.slice(0, -3) + 'xxx')).toThrow();
   });

@@ -19,7 +19,19 @@ async function main() {
     credentials: true,
   });
   app.use((req: any, res: any, next: any) => {
-    res.setHeader('X-Request-Id', randomUUID());
+    const requestId = randomUUID();
+    const started = Date.now();
+    res.setHeader('X-Request-Id', requestId);
+    res.on('finish', () =>
+      console.log(
+        JSON.stringify({
+          requestId,
+          method: req.method,
+          status: res.statusCode,
+          durationMs: Date.now() - started,
+        }),
+      ),
+    );
     if (
       !['GET', 'HEAD', 'OPTIONS'].includes(req.method) &&
       !req.path.startsWith('/callbacks/')

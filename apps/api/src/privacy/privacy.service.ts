@@ -75,6 +75,20 @@ export class PrivacyService {
         await tx.mockTransaction.deleteMany({
           where: { partyHash: request.phoneHash },
         });
+      if (request.kind === 'DELETION') {
+        const refunds = await tx.refund.findMany({
+          where: { contributionId: { in: rows.map((c) => c.id) } },
+          select: { id: true },
+        });
+        await tx.transferAttempt.updateMany({
+          where: {
+            kind: 'refund',
+            jobId: { in: refunds.map((r) => r.id) },
+            status: { in: ['SUCCESSFUL', 'FAILED'] },
+          },
+          data: { partyEnc: '' },
+        });
+      }
       await tx.dataRequest.update({
         where: { id },
         data: {
@@ -161,6 +175,30 @@ export class PrivacyService {
         },
       });
       await this.db.audit('retention', 'POT_ANONYMIZED', pot.id);
+      const payouts = await this.db.payout.findMany({
+        where: { potId: pot.id },
+        select: { id: true },
+      });
+      const refunds = await this.db.refund.findMany({
+        where: { contribution: { potId: pot.id } },
+        select: { id: true },
+      });
+      const attempts = await this.db.transferAttempt.findMany({
+        where: {
+          OR: [
+            { kind: 'payout', jobId: { in: payouts.map((p) => p.id) } },
+            { kind: 'refund', jobId: { in: refunds.map((r) => r.id) } },
+          ],
+        },
+        select: { id: true, providerReference: true },
+      });
+      await this.db.transferAttempt.updateMany({
+        where: { id: { in: attempts.map((a) => a.id) } },
+        data: { partyEnc: '' },
+      });
+      await this.db.mockTransaction.deleteMany({
+        where: { reference: { in: attempts.map((a) => a.providerReference) } },
+      });
     }
   }
 }

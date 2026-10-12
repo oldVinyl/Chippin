@@ -57,6 +57,7 @@ export class PotsService {
           ? (process.env.MOMO_CURRENCY ?? 'EUR')
           : (process.env.CURRENCY ?? 'GHS'),
       demo: process.env.MOMO_MODE === 'mock',
+      mode: process.env.MOMO_MODE ?? 'mock',
       organizer: {
         name: pot.organizer.name,
         verified: pot.organizer.verificationStatus === 'VERIFIED',
@@ -203,7 +204,11 @@ export class PotsService {
         status: c.status,
         reference: c.providerReference,
         at: c.createdAt,
-        phone: c.msisdnEnc ? maskPhone(decrypt(c.msisdnEnc)) : 'Removed',
+        phone: c.isAnonymous
+          ? 'Private'
+          : c.msisdnEnc
+            ? maskPhone(decrypt(c.msisdnEnc))
+            : 'Removed',
       })),
       payouts: await this.db.payout.findMany({
         where: { potId: id },
