@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: chippin-api
+    runtime: docker
+    dockerfilePath: apps/api/Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: '4000'
+      - key: MOMO_MODE
+        value: mock
+      - key: CURRENCY
+        value: GHS
+      - key: DATABASE_URL
+        sync: false
+      - key: WEB_URL
+        sync: false
+      - key: PHONE_ENCRYPTION_KEY
+        sync: false
+      - key: PHONE_HASH_KEY
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: DEMO_PASSWORD
+        sync: false

@@ -1,0 +1,29 @@
+name: checks
+on: [push, pull_request]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: chippin
+          POSTGRES_PASSWORD: local_only_change_me
+          POSTGRES_DB: chippin
+        ports: ['5434:5432']
+        options: --health-cmd "pg_isready -U chippin" --health-interval 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec tsx scripts/local-setup.ts
+      - run: pnpm db:generate && pnpm db:deploy && pnpm seed
+      - run: pnpm test && pnpm contrast:check && pnpm assets:check
+      - run: pnpm build
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:e2e
+      - run: pnpm audit --prod --audit-level high
