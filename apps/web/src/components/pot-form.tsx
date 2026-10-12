@@ -1,4 +1,5 @@
 'use client';
+import { ui } from '../copy/interface';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -20,13 +21,13 @@ export function PotForm({ initial }: { initial?: any }) {
   if (!user)
     return (
       <section className="page narrow">
-        <h1>Let’s make something good.</h1>
-        <p>Create an organizer account to start your pot.</p>
+        <h1>{ui.letsMakeSomethingGood}</h1>
+        <p>{ui.createAnOrganizerAccountToStartYourPot}</p>
         <Link href="/signup" className="button">
-          Create an account
+          {ui.createAnAccount}
         </Link>
         <Link href="/login" className="text-link" style={{ marginLeft: 20 }}>
-          Sign in
+          {ui.signIn}
         </Link>
       </section>
     );
@@ -71,19 +72,24 @@ export function PotForm({ initial }: { initial?: any }) {
   return (
     <section className="page narrow">
       <Link className="back" href="/dashboard">
-        Back to my {terms.potsLower}
+        {ui.backToMy}
+        {terms.potsLower}
       </Link>
       <div className="page-heading">
-        <p className="eyebrow">YOUR PEOPLE. YOUR PURPOSE.</p>
-        <h1>{initial ? 'Make it yours.' : `Start a ${terms.potLower}.`}</h1>
-        <p>Tell your people what you’re bringing together.</p>
+        <p className="eyebrow">{ui.yourPeopleYourPurpose}</p>
+        <h1>{initial ? ui.makeItYours : `Start a ${terms.potLower}.`}</h1>
+        <p>{ui.tellYourPeopleWhatYoureBringingTogether}</p>
       </div>
       {!user.phoneVerified && (
         <ErrorNote message="Verify your phone in the dashboard before creating a pot." />
       )}
       <form onSubmit={submit}>
         <div className="field">
-          <label htmlFor="name">Give your {terms.potLower} a name</label>
+          <label htmlFor="name">
+            {ui.giveYour}
+            {terms.potLower}
+            {ui.aName}
+          </label>
           <input
             id="name"
             name="name"
@@ -94,7 +100,7 @@ export function PotForm({ initial }: { initial?: any }) {
           />
         </div>
         <div className="field">
-          <label htmlFor="story">The story behind it</label>
+          <label htmlFor="story">{ui.theStoryBehindIt}</label>
           <textarea
             id="story"
             name="story"
@@ -104,7 +110,7 @@ export function PotForm({ initial }: { initial?: any }) {
             required
           />
         </div>
-        <label>Choose a cover</label>
+        <label>{ui.chooseACover}</label>
         <div className="cover-picker">
           {assets.covers.map((src, i) => (
             <button
@@ -121,7 +127,7 @@ export function PotForm({ initial }: { initial?: any }) {
         </div>
         <div className="form-grid">
           <div className="field">
-            <label htmlFor="target">Target (optional)</label>
+            <label htmlFor="target">{ui.targetOptional}</label>
             <input
               id="target"
               name="target"
@@ -132,28 +138,28 @@ export function PotForm({ initial }: { initial?: any }) {
             />
           </div>
           <div className="field">
-            <label htmlFor="deadline">Deadline (optional)</label>
+            <label htmlFor="deadline">{ui.deadlineOptional}</label>
             <input id="deadline" name="deadline" type="datetime-local" />
           </div>
         </div>
         <div className="field">
-          <label htmlFor="mode">When should funds go out?</label>
+          <label htmlFor="mode">{ui.whenShouldFundsGoOut}</label>
           <select
             id="mode"
             value={mode}
             onChange={(e) => setMode(e.target.value)}
           >
-            <option value="ON_CLOSE">When I close the pot</option>
-            <option value="SCHEDULED">At a set time</option>
+            <option value="ON_CLOSE">{ui.whenICloseThePot}</option>
+            <option value="SCHEDULED">{ui.atASetTime}</option>
             {user.verified === 'VERIFIED' && (
-              <option value="INSTANT">As contributions arrive</option>
+              <option value="INSTANT">{ui.asContributionsArrive}</option>
             )}
           </select>
-          <small>Instant payouts are available to verified organizers.</small>
+          <small>{ui.instantPayoutsAreAvailableToVerifiedOrganizers}</small>
         </div>
         {mode === 'SCHEDULED' && (
           <div className="field">
-            <label htmlFor="payoutAt">Payout time</label>
+            <label htmlFor="payoutAt">{ui.payoutTime}</label>
             <input
               name="payoutAt"
               id="payoutAt"
@@ -163,7 +169,7 @@ export function PotForm({ initial }: { initial?: any }) {
           </div>
         )}
         <div className="field">
-          <label htmlFor="phone">Payout MoMo number</label>
+          <label htmlFor="phone">{ui.payoutMomoNumber}</label>
           <input
             name="phone"
             id="phone"
@@ -173,12 +179,12 @@ export function PotForm({ initial }: { initial?: any }) {
           />
           <small>
             {initial?.payoutLocked
-              ? 'Locked after the first successful contribution. Enter the same payout number.'
-              : 'This number locks after the first successful contribution.'}
+              ? ui.lockedAfterTheFirstSuccessfulContributionEnterThe
+              : ui.thisNumberLocksAfterTheFirstSuccessfulContribution}
           </small>
         </div>
         <div className="field">
-          <label htmlFor="account">Payout account holder’s name</label>
+          <label htmlFor="account">{ui.payoutAccountHoldersName}</label>
           <input
             name="account"
             id="account"
@@ -192,7 +198,7 @@ export function PotForm({ initial }: { initial?: any }) {
             name="amounts"
             defaultChecked={initial?.showAmountsPublicly ?? true}
           />
-          <span>Show contribution amounts in the public donor book.</span>
+          <span>{ui.showContributionAmountsInThePublicDonorBook}</span>
         </label>
         <label className="check">
           <input
@@ -200,10 +206,10 @@ export function PotForm({ initial }: { initial?: any }) {
             name="anonymous"
             defaultChecked={initial?.allowAnonymous ?? true}
           />
-          <span>Let people give anonymously.</span>
+          <span>{ui.letPeopleGiveAnonymously}</span>
         </label>
         <div className="field">
-          <label htmlFor="minimum">Minimum contribution</label>
+          <label htmlFor="minimum">{ui.minimumContribution}</label>
           <input
             name="minimum"
             id="minimum"
@@ -217,7 +223,7 @@ export function PotForm({ initial }: { initial?: any }) {
           />
         </div>
         <div className="field">
-          <label htmlFor="thanks">Your thank-you message</label>
+          <label htmlFor="thanks">{ui.yourThankyouMessage}</label>
           <textarea
             name="thanks"
             id="thanks"
@@ -234,9 +240,9 @@ export function PotForm({ initial }: { initial?: any }) {
           disabled={busy || !user.phoneVerified}
         >
           {busy
-            ? 'Getting it ready…'
+            ? ui.gettingItReady
             : initial
-              ? 'Save changes'
+              ? ui.saveChanges
               : `Create my ${terms.potLower}`}
         </button>
       </form>

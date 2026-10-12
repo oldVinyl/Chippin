@@ -1,4 +1,5 @@
 'use client';
+import { ui } from '../copy/interface';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -29,9 +30,10 @@ export default function Home() {
             {copy.hero.eyebrow}
           </p>
           <h1>
-            Good things happen
+            {ui.goodThingsHappen}
             <br />
-            when we <span className="scribble">chip in.</span>
+            {ui.whenWe}
+            <span className="scribble">{ui.chipIn}</span>
           </h1>
           <p className="hero-description">{copy.hero.body}</p>
           <div className="hero-actions">
@@ -55,24 +57,24 @@ export default function Home() {
         </div>
         <div className="hero-art">
           <span className="art-note">
-            Small chips.
+            {ui.smallChips}
             <br />
-            Big love.
+            {ui.bigLove}
           </span>
           <Image
             src={assets.hero}
-            width={610}
-            height={530}
+            width={560}
+            height={500}
             priority
-            alt="A happy chocolate-chip cookie gathers little hearts in a shared pot."
+            alt={ui.aHappyChocolatechipCookieGathersLittleHeartsIn}
           />
           <div className="art-caption">
             <span className="avatar-stack">
-              <i>A</i>
-              <i>K</i>
-              <i>E</i>
+              <i>{ui.a}</i>
+              <i>{ui.k}</i>
+              <i>{ui.e}</i>
             </span>
-            <span>A little from all of us.</span>
+            <span>{ui.aLittleFromAllOfUs2}</span>
             <Heart size={22} weight="fill" />
           </div>
         </div>
@@ -80,8 +82,12 @@ export default function Home() {
       <section className="join-band">
         <div className="wrap join-inner">
           <div>
-            <p className="eyebrow">YOU’RE IN GOOD COMPANY</p>
-            <h2>Already have a {terms.potLower} code?</h2>
+            <p className="eyebrow">{ui.youreInGoodCompany}</p>
+            <h2>
+              {ui.alreadyHaveA}
+              {terms.potLower}
+              {ui.code}
+            </h2>
           </div>
           <form
             onSubmit={(e) => {
@@ -93,18 +99,20 @@ export default function Home() {
             }}
           >
             <label className="sr-only" htmlFor="pot-code">
-              {terms.pot} code
+              {terms.pot}
+              {ui.code2}
             </label>
             <input
               id="pot-code"
-              placeholder="Enter your pot code"
+              placeholder={ui.enterYourPotCode}
               value={code}
               maxLength={20}
               onChange={(e) => setCode(e.target.value)}
               required
             />
             <button className="button" type="submit">
-              Find my {terms.potLower}
+              {ui.findMy}
+              {terms.potLower}
               <ArrowRight size={23} />
             </button>
           </form>
@@ -112,9 +120,13 @@ export default function Home() {
       </section>
       <section className="wrap how" id="how-it-works">
         <div className="section-heading">
-          <p className="eyebrow">LESS FUSS. MORE TOGETHER.</p>
-          <h2>One {terms.potLower}. Three little steps.</h2>
-          <p>From “we should do something” to making it happen.</p>
+          <p className="eyebrow">{ui.lessFussMoreTogether}</p>
+          <h2>
+            {ui.one}
+            {terms.potLower}
+            {ui.threeLittleSteps}
+          </h2>
+          <p>{ui.fromWeShouldDoSomethingToMakingIt}</p>
         </div>
         <div className="steps">
           {copy.steps.map((step, i) => (
@@ -136,17 +148,19 @@ export default function Home() {
       </section>
       <section className="together wrap">
         <div className="together-intro">
-          <p className="eyebrow">FOR REAL LIFE, AND REAL PEOPLE</p>
+          <p className="eyebrow">{ui.forRealLifeAndRealPeople}</p>
           <h2>
-            Some things take
-            <br />a whole village.
+            {ui.someThingsTake}
+            <br />
+            {ui.aWholeVillage}
           </h2>
           <p>
-            A wedding. A school roof. A friend who needs a hand. Whatever brings
-            you together, there’s a {terms.potLower} for it.
+            {ui.aWeddingASchoolRoofAFriendWho}
+            {terms.potLower}
+            {ui.forIt}
           </p>
           <Link href="/p/AKWAABA" className="text-link">
-            Take a look inside
+            {ui.takeALookInside}
             <ArrowUpRight size={22} />
           </Link>
         </div>
@@ -154,22 +168,22 @@ export default function Home() {
           <div className="featured-cover">
             <Image
               src={assets.covers[4]}
-              alt="A calm illustration of a school and leafy courtyard"
+              alt={ui.aCalmIllustrationOfASchoolAndLeafy}
               fill
               sizes="(max-width: 700px) 100vw, 500px"
             />
-            <span className="cover-label">COMMUNITY IN ACTION</span>
+            <span className="cover-label">{ui.communityInAction}</span>
           </div>
           <div className="featured-content">
             <span className="verified">
               <ShieldCheck size={19} weight="fill" />
-              Verified organizer
+              {ui.verifiedOrganizer}
             </span>
-            <h3>A fresh start for Akwaaba School</h3>
-            <p>New desks. More room to dream.</p>
+            <h3>{ui.aFreshStartForAkwaabaSchool}</h3>
+            <p>{ui.newDesksMoreRoomToDream}</p>
             <div className="amount-line">
-              <strong>GH₵ 2,450</strong>
-              <span>of GH₵ 5,000</span>
+              <strong>{ui.gh2450}</strong>
+              <span>{ui.ofGh5000}</span>
             </div>
             <div className="progress">
               <span style={{ width: '49%' }} />
@@ -177,10 +191,11 @@ export default function Home() {
             <div className="pot-foot">
               <span>
                 <UsersThree size={21} />
-                24 kind people
+                {ui.label24KindPeople}
               </span>
               <span>
-                View {terms.potLower}
+                {ui.view}
+                {terms.potLower}
                 <ArrowUpRight size={20} />
               </span>
             </div>
@@ -190,8 +205,8 @@ export default function Home() {
       <section className="trust-section">
         <div className="wrap">
           <div className="section-heading">
-            <p className="eyebrow">KINDNESS, WITH CLARITY</p>
-            <h2>A warm heart. A clear record.</h2>
+            <p className="eyebrow">{ui.kindnessWithClarity}</p>
+            <h2>{ui.aWarmHeartAClearRecord}</h2>
           </div>
           <div className="trust-grid">
             {[
@@ -219,18 +234,17 @@ export default function Home() {
             ))}
           </div>
           <p className="demo-line">
-            Hackathon prototype · Mock payments move no money · Live service
-            would work with MTN or a licensed payment provider.
+            {ui.hackathonPrototypeMockPaymentsMoveNoMoneyLive}
           </p>
         </div>
       </section>
       <section className="faq wrap">
         <div>
-          <p className="eyebrow">A FEW THINGS YOU MIGHT WONDER</p>
+          <p className="eyebrow">{ui.aFewThingsYouMightWonder}</p>
           <h2>
-            Let’s clear
+            {ui.letsClear}
             <br />
-            things up.
+            {ui.thingsUp}
           </h2>
           <Image src={assets.mark} width={100} height={100} alt="" />
         </div>
@@ -248,17 +262,18 @@ export default function Home() {
         </div>
       </section>
       <section className="last-call wrap">
-        <p className="eyebrow">YOUR PEOPLE. YOUR PURPOSE.</p>
+        <p className="eyebrow">{ui.yourPeopleYourPurpose}</p>
         <h2>
-          Let’s put a little good
+          {ui.letsPutALittleGood}
           <br />
-          into the world.
+          {ui.intoTheWorld}
         </h2>
         <Link href="/dashboard/new" className="button">
-          Start your {terms.potLower}
+          {ui.startYour}
+          {terms.potLower}
           <ArrowUpRight size={24} />
         </Link>
-        <p>It only takes a few minutes.</p>
+        <p>{ui.itOnlyTakesAFewMinutes}</p>
       </section>
     </>
   );

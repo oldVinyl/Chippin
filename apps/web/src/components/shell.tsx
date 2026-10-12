@@ -1,4 +1,5 @@
 'use client';
+import { ui } from '../copy/interface';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowUpRight, Cookie, List, X } from '@phosphor-icons/react';
@@ -9,10 +10,11 @@ export function Header() {
   const [open, setOpen] = useState(false);
   return (
     <header className="site-header">
-      <Link href="/" aria-label="Chippin home" className="brand">
+      <Link href="/" aria-label={ui.chippinHome} className="brand">
         <Image src={assets.mark} width={43} height={43} alt="" />
         <span>
-          chippin<span className="brand-dot">.</span>
+          {ui.chippin}
+          <span className="brand-dot">.</span>
         </span>
       </Link>
       <button
@@ -23,19 +25,21 @@ export function Header() {
       >
         {open ? <X size={26} /> : <List size={26} />}
       </button>
-      <nav aria-label="Main navigation" className={open ? 'nav open' : 'nav'}>
+      <nav aria-label={ui.mainNavigation} className={open ? 'nav open' : 'nav'}>
         <Link href="/#how-it-works" onClick={() => setOpen(false)}>
-          How it works
+          {ui.howItWorks}
         </Link>
         <Link href="/dashboard" onClick={() => setOpen(false)}>
-          My {terms.potsLower}
+          {ui.my}
+          {terms.potsLower}
         </Link>
         <Link
           href="/dashboard/new"
           className="button small"
           onClick={() => setOpen(false)}
         >
-          Start a {terms.potLower}
+          {ui.startA}
+          {terms.potLower}
           <ArrowUpRight size={19} weight="bold" />
         </Link>
       </nav>
@@ -48,21 +52,22 @@ export function Footer() {
       <div className="footer-top">
         <Link className="brand" href="/">
           <Cookie size={32} weight="duotone" />
-          chippin.
+          {ui.chippin2}
         </Link>
-        <span>A little kindness goes a long way.</span>
-        <nav aria-label="Footer">
-          <Link href="/about">About</Link>
-          <Link href="/privacy">Privacy</Link>
-          <Link href="/terms">Terms</Link>
-          <Link href="/data-request">Your data</Link>
+        <span>{ui.aLittleKindnessGoesALongWay}</span>
+        <nav aria-label={ui.footer}>
+          <Link href="/about">{ui.about}</Link>
+          <Link href="/privacy">{ui.privacy}</Link>
+          <Link href="/terms">{ui.terms2}</Link>
+          <Link href="/data-request">{ui.yourData}</Link>
         </nav>
       </div>
       <div className="footer-bottom">
-        <span>Made for the moments we share.</span>
+        <span>{ui.madeForTheMomentsWeShare}</span>
         <a href={credit.url} target="_blank" rel="noopener noreferrer">
-          Built by <strong>{credit.organization}</strong>, by{' '}
-          <strong>{credit.creator}</strong>
+          {ui.builtBy}
+          <strong>{credit.organization}</strong>
+          {ui.by2} <strong>{credit.creator}</strong>
           <ArrowUpRight size={16} />
         </a>
       </div>
@@ -73,7 +78,7 @@ export function Loading() {
   return (
     <div className="loading" role="status">
       <span className="loading-cookie" />
-      <p>Getting things ready…</p>
+      <p>{ui.gettingThingsReady}</p>
     </div>
   );
 }

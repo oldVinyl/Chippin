@@ -1,4 +1,5 @@
 'use client';
+import { ui } from '../../copy/interface';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../../components/use-auth';
@@ -23,9 +24,9 @@ export default function Admin() {
   if (!user?.isAdmin)
     return (
       <section className="page">
-        <h1>Admin access required.</h1>
+        <h1>{ui.adminAccessRequired}</h1>
         <Link className="button" href="/login">
-          Sign in
+          {ui.signIn}
         </Link>
       </section>
     );
@@ -42,14 +43,14 @@ export default function Admin() {
     <section className="page">
       <div className="dashboard-top">
         <div>
-          <p className="eyebrow">LOOKING AFTER THE WHOLE VILLAGE</p>
-          <h1>Admin console</h1>
+          <p className="eyebrow">{ui.lookingAfterTheWholeVillage}</p>
+          <h1>{ui.adminConsole}</h1>
         </div>
         <button
           className="button"
           onClick={() => void action('/admin/reconcile')}
         >
-          Run reconciliation
+          {ui.runReconciliation}
         </button>
       </div>
       <ErrorNote message={error} />
@@ -58,7 +59,7 @@ export default function Admin() {
         <Loading />
       ) : (
         <>
-          <h3>Organizer verification</h3>
+          <h3>{ui.organizerVerification}</h3>
           {data.organizers.length ? (
             data.organizers.map((u: any) => (
               <div key={u.id} className="admin-row">
@@ -74,7 +75,7 @@ export default function Admin() {
                       })
                     }
                   >
-                    Verify
+                    {ui.verify}
                   </button>
                   <button
                     className="button secondary"
@@ -84,15 +85,15 @@ export default function Admin() {
                       })
                     }
                   >
-                    Suspend
+                    {ui.suspend}
                   </button>
                 </div>
               </div>
             ))
           ) : (
-            <p>All caught up.</p>
+            <p>{ui.allCaughtUp}</p>
           )}
-          <h3>Reported pots</h3>
+          <h3>{ui.reportedPots}</h3>
           {data.reports.length ? (
             data.reports.map((r: any) => (
               <div className="admin-row" key={r.id}>
@@ -105,38 +106,69 @@ export default function Admin() {
                     void action(`/admin/pots/${r.potCode}/suspend`)
                   }
                 >
-                  Pause this pot
+                  {ui.pauseThisPot}
                 </button>
               </div>
             ))
           ) : (
-            <p>No reports waiting.</p>
+            <p>{ui.noReportsWaiting}</p>
           )}
-          <h3>Payouts needing attention</h3>
+          <h3>{ui.payoutsNeedingAttention}</h3>
           {data.failedPayouts.length ? (
             data.failedPayouts.map((p: any) => (
               <p key={p.id}>
                 {p.providerReference} · {p.status} · {p.lastError}
-                {p.status==='FAILED'&&<button className="button secondary" onClick={()=>{if(confirm('Retry this provider-confirmed failed payout?'))void action(`/admin/transfers/payout/${p.id}/retry`);}}>Retry payout</button>}
+                {p.status === 'FAILED' && (
+                  <button
+                    className="button secondary"
+                    onClick={() => {
+                      if (confirm(ui.retryThisProviderconfirmedFailedPayout))
+                        void action(`/admin/transfers/payout/${p.id}/retry`);
+                    }}
+                  >
+                    {ui.retryPayout}
+                  </button>
+                )}
               </p>
             ))
           ) : (
-            <p>No delayed payouts.</p>
+            <p>{ui.noDelayedPayouts}</p>
           )}
-          <h3>Unrecovered refunds</h3>
-          <h3>Refund transfers needing attention</h3>
-          {data.failedRefunds?.length?data.failedRefunds.map((r:any)=><div className="admin-row" key={r.id}><span>{r.providerReference} · {r.status} · {r.lastError}</span>{r.status==='FAILED'&&<button className="button secondary" onClick={()=>{if(confirm('Retry this provider-confirmed failed refund?'))void action(`/admin/transfers/refund/${r.id}/retry`);}}>Retry refund</button>}</div>):<p>No delayed refund transfers.</p>}
+          <h3>{ui.unrecoveredRefunds}</h3>
+          <h3>{ui.refundTransfersNeedingAttention}</h3>
+          {data.failedRefunds?.length ? (
+            data.failedRefunds.map((r: any) => (
+              <div className="admin-row" key={r.id}>
+                <span>
+                  {r.providerReference} · {r.status} · {r.lastError}
+                </span>
+                {r.status === 'FAILED' && (
+                  <button
+                    className="button secondary"
+                    onClick={() => {
+                      if (confirm(ui.retryThisProviderconfirmedFailedRefund))
+                        void action(`/admin/transfers/refund/${r.id}/retry`);
+                    }}
+                  >
+                    {ui.retryRefund}
+                  </button>
+                )}
+              </div>
+            ))
+          ) : (
+            <p>{ui.noDelayedRefundTransfers}</p>
+          )}
           {data.unrecovered.length ? (
             data.unrecovered.map((p: any) => (
               <p key={p.id}>
-                <Link href={`/p/${p.code}`}>{p.name}</Link> · Awaiting organizer
-                approval
+                <Link href={`/p/${p.code}`}>{p.name}</Link>
+                {ui.awaitingOrganizerApproval}
               </p>
             ))
           ) : (
-            <p>No recovery cases waiting.</p>
+            <p>{ui.noRecoveryCasesWaiting}</p>
           )}
-          <h3>Data requests</h3>
+          <h3>{ui.dataRequests}</h3>
           {data.requests.length ? (
             data.requests.map((r: any) => (
               <div className="admin-row" key={r.id}>
@@ -155,21 +187,24 @@ export default function Admin() {
                       .catch((e) => setError(e.message))
                   }
                 >
-                  Review request
+                  {ui.reviewRequest}
                 </button>
               </div>
             ))
           ) : (
-            <p>No requests waiting.</p>
+            <p>{ui.noRequestsWaiting}</p>
           )}
           {selected && (
             <section className="surface">
-              <h3>Review {selected.kind.toLowerCase()} request</h3>
+              <h3>
+                {ui.review}
+                {selected.kind.toLowerCase()}
+                {ui.request}
+              </h3>
               <p>{selected.email}</p>
               <p>{selected.details}</p>
               <p className="helper">
-                Verify the person using an existing trusted contact channel. A
-                matching phone number alone is not proof of identity.
+                {ui.verifyThePersonUsingAnExistingTrustedContact}
               </p>
               <label className="check">
                 <input
@@ -177,13 +212,13 @@ export default function Admin() {
                   checked={identityVerified}
                   onChange={(e) => setIdentityVerified(e.target.checked)}
                 />
-                <span>
-                  I verified the requester’s identity outside this form.
-                </span>
+                <span>{ui.iVerifiedTheRequestersIdentityOutsideThisForm}</span>
               </label>
               {selected.kind === 'CORRECTION' && (
                 <div className="field">
-                  <label htmlFor="corrected-name">Correct display name</label>
+                  <label htmlFor="corrected-name">
+                    {ui.correctDisplayName}
+                  </label>
                   <input
                     id="corrected-name"
                     value={correctedName}
@@ -229,12 +264,12 @@ export default function Admin() {
                 }
               >
                 {selected.kind === 'ACCESS'
-                  ? 'Prepare access file'
-                  : 'Fulfill request'}
+                  ? ui.prepareAccessFile
+                  : ui.fulfillRequest}
               </button>
             </section>
           )}
-          <h3>Reconciliation log</h3>
+          <h3>{ui.reconciliationLog}</h3>
           {data.reconciliation.map((r: any) => (
             <p className="helper" key={r.id}>
               {r.action} · {new Date(r.at).toLocaleString('en-GH')}

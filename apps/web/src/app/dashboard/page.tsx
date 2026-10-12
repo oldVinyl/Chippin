@@ -1,4 +1,5 @@
 'use client';
+import { ui } from '../../copy/interface';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -25,14 +26,14 @@ export default function Dashboard() {
   if (!user)
     return (
       <section className="page narrow">
-        <h1>A little good starts here.</h1>
-        <p>Sign in to create and look after your pots.</p>
+        <h1>{ui.aLittleGoodStartsHere}</h1>
+        <p>{ui.signInToCreateAndLookAfterYour}</p>
         <div className="hero-actions">
           <Link href="/login" className="button">
-            Sign in
+            {ui.signIn}
           </Link>
           <Link href="/signup" className="text-link">
-            Create an account
+            {ui.createAnAccount}
             <ArrowUpRight />
           </Link>
         </div>
@@ -52,27 +53,28 @@ export default function Dashboard() {
     <section className="page">
       <div className="dashboard-top">
         <div>
-          <p className="eyebrow">A LITTLE FROM YOUR PEOPLE</p>
-          <h1>Hello, {user.name.split(' ')[0]}.</h1>
-          <p>Good things you’re bringing together.</p>
+          <p className="eyebrow">{ui.aLittleFromYourPeople}</p>
+          <h1>
+            {ui.hello}
+            {user.name.split(' ')[0]}.
+          </h1>
+          <p>{ui.goodThingsYoureBringingTogether}</p>
         </div>
         <Link className="button" href="/dashboard/new">
           <Plus size={22} />
-          Start a {terms.potLower}
+          {ui.startA}
+          {terms.potLower}
         </Link>
       </div>
       <ErrorNote message={error} />
       {notice && <p role="status">{notice}</p>}
       {!user.phoneVerified && (
         <section className="surface">
-          <h3>First, verify your phone.</h3>
-          <p>
-            A code was sent when you signed up. In local development, it appears
-            in the API terminal.
-          </p>
+          <h3>{ui.firstVerifyYourPhone}</h3>
+          <p>{ui.aCodeWasSentWhenYouSignedUp}</p>
           <form onSubmit={verify}>
             <div className="field">
-              <label htmlFor="otp">Six-digit code</label>
+              <label htmlFor="otp">{ui.sixdigitCode}</label>
               <input
                 id="otp"
                 inputMode="numeric"
@@ -83,7 +85,7 @@ export default function Dashboard() {
                 required
               />
             </div>
-            <button className="button">Verify phone</button>
+            <button className="button">{ui.verifyPhone}</button>
             <button
               type="button"
               className="text-link"
@@ -94,14 +96,14 @@ export default function Dashboard() {
                   .catch((e) => setError(e.message))
               }
             >
-              Send a new code
+              {ui.sendANewCode}
             </button>
           </form>
         </section>
       )}
       <div className="stats">
         <div>
-          <span>Raised together</span>
+          <span>{ui.raisedTogether}</span>
           <strong>
             {formatMoney(
               pots.reduce((s, p) => s + p.totalMinor, 0),
@@ -110,11 +112,14 @@ export default function Dashboard() {
           </strong>
         </div>
         <div>
-          <span>Kind contributions</span>
+          <span>{ui.kindContributions}</span>
           <strong>{pots.reduce((s, p) => s + p.count, 0)}</strong>
         </div>
         <div>
-          <span>Your {terms.potsLower}</span>
+          <span>
+            {ui.your}
+            {terms.potsLower}
+          </span>
           <strong>{pots.length}</strong>
         </div>
       </div>
@@ -135,7 +140,10 @@ export default function Dashboard() {
                 <h3>{p.name}</h3>
                 <div className="amount-line">
                   <strong>{formatMoney(p.totalMinor, p.currency)}</strong>
-                  <span>{p.count} contributions</span>
+                  <span>
+                    {p.count}
+                    {ui.contributions}
+                  </span>
                 </div>
                 {p.targetMinor && (
                   <div className="progress">
@@ -147,7 +155,8 @@ export default function Dashboard() {
                   </div>
                 )}
                 <span className="text-link">
-                  Look after this {terms.potLower}
+                  {ui.lookAfterThis}
+                  {terms.potLower}
                   <ArrowUpRight size={20} />
                 </span>
               </div>
@@ -157,10 +166,12 @@ export default function Dashboard() {
       ) : (
         <div className="surface">
           <Image src={assets.empty} width={150} height={130} alt="" />
-          <h3>Your first {terms.potLower} is waiting.</h3>
-          <p>
-            A name, a story and a reason to come together. That’s all it takes.
-          </p>
+          <h3>
+            {ui.yourFirst}
+            {terms.potLower}
+            {ui.isWaiting}
+          </h3>
+          <p>{ui.aNameAStoryAndAReasonTo}</p>
         </div>
       )}
       <div className="dashboard-actions">
@@ -177,12 +188,12 @@ export default function Dashboard() {
                 .catch((e) => setError(e.message))
             }
           >
-            Request organizer verification
+            {ui.requestOrganizerVerification}
           </button>
         )}
         {user.isAdmin && (
           <Link href="/admin" className="button secondary">
-            Admin console
+            {ui.adminConsole2}
           </Link>
         )}
         <button
@@ -193,7 +204,7 @@ export default function Dashboard() {
               .catch((e) => setError(e.message))
           }
         >
-          Sign out
+          {ui.signOut}
         </button>
       </div>
     </section>

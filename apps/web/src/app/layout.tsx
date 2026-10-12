@@ -1,3 +1,4 @@
+import { ui } from '../copy/interface';
 import type { Metadata, Viewport } from 'next';
 import localFont from 'next/font/local';
 import { Header, Footer } from '../components/shell';
@@ -6,12 +7,12 @@ import './globals.css';
 const fredoka = localFont({
   src: '../../node_modules/@fontsource/fredoka/files/fredoka-latin-500-normal.woff2',
   variable: '--font-heading',
-  display: 'swap',
+  display: 'optional',
 });
 const nunito = localFont({
   src: '../../node_modules/@fontsource/nunito/files/nunito-latin-400-normal.woff2',
   variable: '--font-body',
-  display: 'swap',
+  display: 'optional',
 });
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -46,7 +47,7 @@ export default function RootLayout({
     <html lang="en" className={`${fredoka.variable} ${nunito.variable}`}>
       <body>
         <a className="skip" href="#main">
-          Skip to content
+          {ui.skipToContent}
         </a>
         <Header />
         <main id="main">{children}</main>

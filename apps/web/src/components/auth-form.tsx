@@ -1,4 +1,5 @@
 'use client';
+import { ui } from '../copy/interface';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -40,21 +41,19 @@ export function AuthForm({ signup = false }: { signup?: boolean }) {
   return (
     <section className="page narrow">
       <div className="page-heading">
-        <p className="eyebrow">YOUR PEOPLE. YOUR PURPOSE.</p>
-        <h1>
-          {signup ? 'A good thing starts with you.' : 'Good to have you back.'}
-        </h1>
+        <p className="eyebrow">{ui.yourPeopleYourPurpose}</p>
+        <h1>{signup ? ui.aGoodThingStartsWithYou : ui.goodToHaveYouBack}</h1>
         <p>
           {signup
-            ? 'Create an organizer account. Your friends won’t need one to contribute.'
-            : 'Sign in to look after your pots.'}
+            ? ui.createAnOrganizerAccountYourFriendsWontNeed
+            : ui.signInToLookAfterYourPots}
         </p>
       </div>
       <form onSubmit={submit}>
         {signup && (
           <>
             <div className="field">
-              <label htmlFor="name">Your full name</label>
+              <label htmlFor="name">{ui.yourFullName}</label>
               <input
                 id="name"
                 name="name"
@@ -64,7 +63,7 @@ export function AuthForm({ signup = false }: { signup?: boolean }) {
               />
             </div>
             <div className="field">
-              <label htmlFor="phone">Your mobile number</label>
+              <label htmlFor="phone">{ui.yourMobileNumber}</label>
               <input
                 id="phone"
                 name="phone"
@@ -76,7 +75,7 @@ export function AuthForm({ signup = false }: { signup?: boolean }) {
           </>
         )}
         <div className="field">
-          <label htmlFor="email">Email address</label>
+          <label htmlFor="email">{ui.emailAddress}</label>
           <input
             id="email"
             name="email"
@@ -86,7 +85,7 @@ export function AuthForm({ signup = false }: { signup?: boolean }) {
           />
         </div>
         <div className="field">
-          <label htmlFor="password">Password</label>
+          <label htmlFor="password">{ui.password}</label>
           <input
             id="password"
             name="password"
@@ -95,27 +94,28 @@ export function AuthForm({ signup = false }: { signup?: boolean }) {
             minLength={10}
             required
           />
-          <small>At least 10 characters.</small>
+          <small>{ui.atLeast10Characters}</small>
         </div>
         {signup && (
           <label className="check">
             <input name="terms" type="checkbox" required />
             <span>
-              I am 18 or older and accept the <Link href="/terms">Terms</Link>{' '}
-              and <Link href="/privacy">Privacy Policy</Link>.
+              {ui.iAm18OrOlderAndAcceptThe}
+              <Link href="/terms">{ui.terms2}</Link> {ui.and2}
+              <Link href="/privacy">{ui.privacyPolicy2}</Link>.
             </span>
           </label>
         )}
         <ErrorNote message={error} />
         <button className="button form-full" disabled={busy}>
-          {busy ? 'Just a moment…' : signup ? 'Create my account' : 'Sign in'}
+          {busy ? ui.justAMoment : signup ? ui.createMyAccount : ui.signIn2}
           <ArrowRight size={21} />
         </button>
       </form>
       <p style={{ marginTop: 25 }}>
-        {signup ? 'Already have an account?' : 'New here?'}{' '}
+        {signup ? ui.alreadyHaveAnAccount : ui.newHere}{' '}
         <Link className="text-link" href={signup ? '/login' : '/signup'}>
-          {signup ? 'Sign in' : 'Create an account'}
+          {signup ? ui.signIn2 : ui.createAnAccount2}
         </Link>
       </p>
     </section>

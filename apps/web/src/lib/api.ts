@@ -1,3 +1,11 @@
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    public readonly status: number,
+  ) {
+    super(message);
+  }
+}
 export async function api<T = any>(
   path: string,
   options: RequestInit = {},
@@ -9,12 +17,20 @@ export async function api<T = any>(
   });
   const raw = await response.text();
   let data: any;
-  try { data = JSON.parse(raw); } catch { throw new Error('The server is taking a little break. Please try again in a moment.'); }
+  try {
+    data = JSON.parse(raw);
+  } catch {
+    throw new ApiError(
+      'The server is taking a little break. Please try again in a moment.',
+      response.ok ? 502 : response.status,
+    );
+  }
   if (!response.ok)
-    throw new Error(
+    throw new ApiError(
       Array.isArray(data.message)
         ? data.message.join(' ')
         : data.message || 'Something went wrong. Please try again.',
+      response.status,
     );
   return data;
 }
@@ -49,6 +65,7 @@ export type Pot = {
   unrecovered: boolean;
   currency: string;
   demo: boolean;
+  mode: 'mock' | 'sandbox' | 'live';
   totalMinor: number;
   count: number;
   organizer: { name: string; verified: boolean };

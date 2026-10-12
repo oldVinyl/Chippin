@@ -1,4 +1,5 @@
 'use client';
+import { ui } from '../../../../copy/interface';
 import { use, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -86,22 +87,29 @@ export default function Pay({ params }: { params: Promise<{ code: string }> }) {
     <section className="page narrow">
       <Link className="back" href={`/p/${code}`}>
         <ArrowLeft />
-        Back to the {terms.potLower}
+        {ui.backToThe}
+        {terms.potLower}
       </Link>
       <div className="page-heading">
-        <p className="eyebrow">A LITTLE KINDNESS, RIGHT HERE</p>
+        <p className="eyebrow">{ui.aLittleKindnessRightHere}</p>
         <h1>
-          {terms.chipIn} for
+          {terms.chipIn}
+          {ui.for}
           <br />
           {pot.name}
         </h1>
-        <p>Your contribution joins {pot.count} others. Every bit counts.</p>
+        <p>
+          {ui.yourContributionJoins}
+          {pot.count}
+          {ui.othersEveryBitCounts}
+        </p>
       </div>
-      {pot.demo && <span className="tag">DEMO · NO MONEY MOVES</span>}
+      {pot.demo && <span className="tag">{ui.demoNoMoneyMoves}</span>}
       <form onSubmit={submit}>
         <div className="field">
           <label htmlFor="amount">
-            How much would you like to give? ({pot.currency})
+            {ui.howMuchWouldYouLikeToGive}
+            {pot.currency})
           </label>
           <div className="quick-amounts">
             {[20, 50, 100, 200].map((a) => (
@@ -130,12 +138,13 @@ export default function Pay({ params }: { params: Promise<{ code: string }> }) {
             required
           />
           <small>
-            Minimum {formatMoney(pot.minContributionMinor, pot.currency)}. Fee:{' '}
-            {formatMoney(0, pot.currency)}.
+            {ui.minimum}
+            {formatMoney(pot.minContributionMinor, pot.currency)}
+            {ui.fee} {formatMoney(0, pot.currency)}.
           </small>
         </div>
         <div className="field">
-          <label htmlFor="phone">Your MoMo number</label>
+          <label htmlFor="phone">{ui.yourMomoNumber}</label>
           <input
             id="phone"
             type="tel"
@@ -152,11 +161,11 @@ export default function Pay({ params }: { params: Promise<{ code: string }> }) {
           <small>
             {network
               ? `Network: ${network}. Number portability may affect this estimate.`
-              : 'Use the number on your own MoMo account.'}
+              : ui.useTheNumberOnYourOwnMomoAccount}
           </small>
         </div>
         <div className="field">
-          <label htmlFor="name">Your name (optional)</label>
+          <label htmlFor="name">{ui.yourNameOptional}</label>
           <input
             id="name"
             autoComplete="name"
@@ -179,11 +188,11 @@ export default function Pay({ params }: { params: Promise<{ code: string }> }) {
                 key.current = '';
               }}
             />
-            <span>Give anonymously. Keep my name out of the donor book.</span>
+            <span>{ui.giveAnonymouslyKeepMyNameOutOfThe}</span>
           </label>
         )}
         <div className="field">
-          <label htmlFor="message">A little message (optional)</label>
+          <label htmlFor="message">{ui.aLittleMessageOptional}</label>
           <textarea
             id="message"
             value={message}
@@ -196,7 +205,7 @@ export default function Pay({ params }: { params: Promise<{ code: string }> }) {
         </div>
         {pot.demo && (
           <div className="field">
-            <label htmlFor="scenario">Demo payment outcome</label>
+            <label htmlFor="scenario">{ui.demoPaymentOutcome}</label>
             <select
               id="scenario"
               value={scenario}
@@ -205,31 +214,33 @@ export default function Pay({ params }: { params: Promise<{ code: string }> }) {
                 key.current = '';
               }}
             >
-              <option value="success">Successful contribution</option>
-              <option value="declined">Declined</option>
-              <option value="timeout">Still checking (timeout)</option>
-              <option value="delayed">Delayed success (45 seconds)</option>
-              <option value="missing-callback">Callback never arrives</option>
-              <option value="duplicate">Duplicate callback</option>
+              <option value="success">{ui.successfulContribution}</option>
+              <option value="declined">{ui.declined}</option>
+              <option value="timeout">{ui.stillCheckingTimeout}</option>
+              <option value="delayed">{ui.delayedSuccess45Seconds}</option>
+              <option value="missing-callback">
+                {ui.callbackNeverArrives}
+              </option>
+              <option value="duplicate">{ui.duplicateCallback}</option>
             </select>
           </div>
         )}
         <div className="summary">
           <dl>
             <div>
-              <dt>Your contribution</dt>
+              <dt>{ui.yourContribution}</dt>
               <dd>{formatMoney(minor, pot.currency)}</dd>
             </div>
             <div>
-              <dt>Chippin fee</dt>
+              <dt>{ui.chippinFee}</dt>
               <dd>{formatMoney(0, pot.currency)}</dd>
             </div>
             <div>
-              <dt>Total to approve</dt>
+              <dt>{ui.totalToApprove}</dt>
               <dd>{formatMoney(minor, pot.currency)}</dd>
             </div>
             <div>
-              <dt>Paid to</dt>
+              <dt>{ui.paidTo2}</dt>
               <dd>{pot.payoutAccountName}</dd>
             </div>
           </dl>
@@ -246,15 +257,15 @@ export default function Pay({ params }: { params: Promise<{ code: string }> }) {
             }}
           />
           <span>
-            I’m 18 or older and agree to the{' '}
+            {ui.im18OrOlderAndAgreeToThe}{' '}
             <Link href="/privacy" target="_blank">
-              Privacy Policy
+              {ui.privacyPolicy}
             </Link>{' '}
-            and{' '}
+            {ui.and}{' '}
             <Link href="/terms" target="_blank">
-              Terms
+              {ui.terms}
             </Link>
-            . My number is kept privately for this payment and any refund.
+            {ui.myNumberIsKeptPrivatelyForThisPayment}
           </span>
         </label>
         <ErrorNote message={failure} />
@@ -265,9 +276,7 @@ export default function Pay({ params }: { params: Promise<{ code: string }> }) {
               checked={duplicate}
               onChange={(e) => setDuplicate(e.target.checked)}
             />
-            <span>
-              I checked my receipt and want to make another contribution.
-            </span>
+            <span>{ui.iCheckedMyReceiptAndWantToMake}</span>
           </label>
         )}
         <button
@@ -276,7 +285,7 @@ export default function Pay({ params }: { params: Promise<{ code: string }> }) {
           type="submit"
         >
           {busy
-            ? 'Getting your payment ready…'
+            ? ui.gettingYourPaymentReady
             : `${terms.chipIn} ${formatMoney(minor, pot.currency)}`}
           <ArrowRight size={22} />
         </button>

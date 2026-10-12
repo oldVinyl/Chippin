@@ -1,4 +1,5 @@
 'use client';
+import { ui } from '../copy/interface';
 import { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 import {
@@ -46,16 +47,16 @@ export function SharePanel({ name, code }: { name: string; code: string }) {
       );
   }
   return (
-    <section className="share-panel" aria-label="Share this pot">
-      <h3>Bring your people.</h3>
+    <section className="share-panel" aria-label={ui.shareThisPot}>
+      <h3>{ui.bringYourPeople}</h3>
       <div className="share-actions">
         <button className="button secondary" onClick={copy}>
           {copied ? <Check size={20} /> : <Copy size={20} />}{' '}
-          {copied ? 'Copied!' : 'Copy link'}
+          {copied ? ui.copied : ui.copyLink}
         </button>
         <button className="button secondary" onClick={share}>
           <ShareNetwork size={20} />
-          Share
+          {ui.share}
         </button>
       </div>
       {error && <p role="alert">{error}</p>}
@@ -70,13 +71,14 @@ export function SharePanel({ name, code }: { name: string; code: string }) {
             download={`chippin-${code}.svg`}
             href={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`}
           >
-            <DownloadSimple size={17} style={{ display: 'inline' }} /> Download
-            QR code
+            <DownloadSimple size={17} style={{ display: 'inline' }} />
+            {ui.downloadQrCode}
           </a>
         </>
       )}
       <p className="helper">
-        Pot code: <strong>{code}</strong>
+        {ui.potCode}
+        <strong>{code}</strong>
       </p>
     </section>
   );

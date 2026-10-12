@@ -1,4 +1,5 @@
-export const copy = {
+import { copyTerms } from './terms';
+const english = {
   hero: {
     eyebrow: 'A LITTLE FROM EACH OF US. A LOT FOR SOMEONE.',
     title: 'Good things happen when we chip in.',
@@ -61,3 +62,4 @@ export const copy = {
   terms:
     'Draft terms — legal review required before live launch. Chippin is for adults aged 18 and above with their own MoMo accounts. Verify the organizer and purpose before giving. We are a hackathon prototype and do not claim to be a licensed payment provider. Mock payments move no money; sandbox payments use test currency. You choose the amount and accept the displayed fee before submitting. Payment outcomes are confirmed by the provider. An organizer’s payout mode is shown on each pot. Before payout, available funds can be refunded. After payout, the organizer must approve returning funds; Chippin cannot pull money from a wallet or guarantee recovery. Abuse may result in suspension and a pause on payouts. These terms do not remove your rights under Ghanaian law.',
 } as const;
+export const copy = copyTerms(english);

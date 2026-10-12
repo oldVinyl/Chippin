@@ -1,4 +1,5 @@
 'use client';
+import { ui } from '../../../copy/interface';
 import { use, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { formatMoney } from '@chippin/shared';
@@ -47,19 +48,27 @@ export default function PotDashboard({
           if (mounted) setError(e.message);
         });
     refresh();
+    const events = new EventSource(`/api/dashboard/pots/${id}/events`);
+    events.onmessage = (event) => {
+      try {
+        const value = JSON.parse(event.data);
+        if (mounted && !value.unavailable) setPot(value);
+      } catch {}
+    };
     const timer = setInterval(refresh, 5000);
     return () => {
       mounted = false;
       clearInterval(timer);
+      events.close();
     };
   }, [user, id]);
   if (!ready) return <Loading />;
   if (!user)
     return (
       <section className="page narrow">
-        <h1>Please sign in.</h1>
+        <h1>{ui.pleaseSignIn}</h1>
         <Link className="button" href="/login">
-          Sign in
+          {ui.signIn}
         </Link>
       </section>
     );
@@ -76,7 +85,7 @@ export default function PotDashboard({
       <>
         <div className="page" style={{ paddingBottom: 0, minHeight: 0 }}>
           <button className="text-link" onClick={() => setTab('Overview')}>
-            Back to overview
+            {ui.backToOverview}
           </button>
         </div>
         <PotForm initial={pot} />
@@ -141,7 +150,8 @@ export default function PotDashboard({
   return (
     <section className="page">
       <Link href="/dashboard" className="back">
-        Back to my {terms.potsLower}
+        {ui.backToMy}
+        {terms.potsLower}
       </Link>
       <div className="dashboard-top">
         <div>
@@ -152,7 +162,7 @@ export default function PotDashboard({
           </p>
         </div>
         <Link className="button secondary" href={`/p/${pot.code}`}>
-          Open public page
+          {ui.openPublicPage}
         </Link>
       </div>
       <ErrorNote message={error} />
@@ -173,15 +183,15 @@ export default function PotDashboard({
         <>
           <div className="stats">
             <div>
-              <span>Total raised</span>
+              <span>{ui.totalRaised}</span>
               <strong>{formatMoney(pot.totalMinor, pot.currency)}</strong>
             </div>
             <div>
-              <span>Contributions</span>
+              <span>{ui.contributions2}</span>
               <strong>{pot.count}</strong>
             </div>
             <div>
-              <span>Average contribution</span>
+              <span>{ui.averageContribution}</span>
               <strong>
                 {formatMoney(
                   pot.count ? Math.round(pot.totalMinor / pot.count) : 0,
@@ -192,12 +202,12 @@ export default function PotDashboard({
           </div>
           {tab === 'Overview' && (
             <>
-              <h3>A little more, each day.</h3>
+              <h3>{ui.aLittleMoreEachDay}</h3>
               <svg
                 className="chart"
                 viewBox="0 0 700 160"
                 role="img"
-                aria-label="Successful contributions over the last seven days"
+                aria-label={ui.successfulContributionsOverTheLastSevenDays}
               >
                 {days.map((d, i) => (
                   <g key={d.label}>
@@ -221,9 +231,9 @@ export default function PotDashboard({
                   </g>
                 ))}
               </svg>
-              <h3>Where the funds are.</h3>
+              <h3>{ui.whereTheFundsAre}</h3>
               <p>
-                Available after reservations:{' '}
+                {ui.availableAfterReservations}{' '}
                 <strong>
                   {formatMoney(pot.balanceMinor ?? 0, pot.currency)}
                 </strong>
@@ -233,24 +243,26 @@ export default function PotDashboard({
                   <p key={p.id}>
                     {formatMoney(p.amountMinor, pot.currency)} ·{' '}
                     {p.status === 'UNKNOWN'
-                      ? 'Checking with MoMo'
+                      ? ui.checkingWithMomo
                       : p.status === 'FAILED'
-                        ? 'Payout delayed — admin review needed'
+                        ? ui.payoutDelayedAdminReviewNeeded
                         : p.status}
                   </p>
                 ))
               ) : (
                 <p>
-                  No payouts yet.{' '}
+                  {ui.noPayoutsYet}{' '}
                   {pot.payoutMode === 'ON_CLOSE'
-                    ? 'Funds are released when you close the pot.'
-                    : 'Payouts follow your chosen schedule.'}
+                    ? ui.fundsAreReleasedWhenYouCloseThePot
+                    : ui.payoutsFollowYourChosenSchedule}
                 </p>
               )}
               {pot.refunds.length > 0 && (
                 <p>
                   {pot.refunds.filter((r) => r.status === 'SUCCESSFUL').length}{' '}
-                  of {pot.refunds.length} refunded.
+                  {ui.of}
+                  {pot.refunds.length}
+                  {ui.refunded}
                 </p>
               )}
               {pot.unrecovered && (
@@ -262,7 +274,9 @@ export default function PotDashboard({
                     className="button"
                     onClick={() => void action('close')}
                   >
-                    Close {terms.potLower} & release funds
+                    {ui.close}
+                    {terms.potLower}
+                    {ui.releaseFunds}
                   </button>
                 )}
                 {!['REFUNDING', 'REFUNDED'].includes(pot.status) && (
@@ -270,7 +284,7 @@ export default function PotDashboard({
                     className="button secondary"
                     onClick={() => void action('cancel')}
                   >
-                    Cancel & request refunds
+                    {ui.cancelRequestRefunds}
                   </button>
                 )}
               </div>
@@ -279,7 +293,7 @@ export default function PotDashboard({
           <h3>{terms.donorBook}</h3>
           <div className="form-grid">
             <div className="field">
-              <label htmlFor="search">Find a contributor</label>
+              <label htmlFor="search">{ui.findAContributor}</label>
               <input
                 id="search"
                 value={search}
@@ -287,7 +301,7 @@ export default function PotDashboard({
               />
             </div>
             <div className="field">
-              <label htmlFor="filter">Payment status</label>
+              <label htmlFor="filter">{ui.paymentStatus}</label>
               <select
                 id="filter"
                 value={filter}
@@ -305,12 +319,12 @@ export default function PotDashboard({
             <table>
               <thead>
                 <tr>
-                  <th>Name</th>
-                  <th>Amount</th>
-                  <th>Status</th>
-                  <th>Refund</th>
-                  <th>MoMo number</th>
-                  <th>Date</th>
+                  <th>{ui.name}</th>
+                  <th>{ui.amount}</th>
+                  <th>{ui.status}</th>
+                  <th>{ui.refund}</th>
+                  <th>{ui.momoNumber}</th>
+                  <th>{ui.date}</th>
                 </tr>
               </thead>
               <tbody>
@@ -325,7 +339,7 @@ export default function PotDashboard({
                           onClick={() => {
                             if (
                               confirm(
-                                'Return this contribution to its original MoMo number?',
+                                ui.returnThisContributionToItsOriginalMomoNumber,
                               )
                             )
                               void api(
@@ -339,7 +353,7 @@ export default function PotDashboard({
                                 .catch((e) => setError(e.message));
                           }}
                         >
-                          Refund
+                          {ui.refund2}
                         </button>
                       )}
                     </td>
@@ -351,7 +365,7 @@ export default function PotDashboard({
                             aria-label={`Reveal number for ${c.name}`}
                             onClick={() => void reveal(c.id)}
                           >
-                            Reveal
+                            {ui.reveal}
                           </button>
                         )}
                     </td>
@@ -362,32 +376,31 @@ export default function PotDashboard({
             </table>
           </div>
           <p className="helper">
-            Phone numbers are masked. Reveals are recorded. Anonymous names stay
-            private in exports.
+            {ui.phoneNumbersAreMaskedRevealsAreRecordedAnonymous}
           </p>
           <div className="dashboard-actions">
             <a
               className="button secondary"
               href={`/api/dashboard/pots/${id}/export?format=csv`}
             >
-              Download CSV
+              {ui.downloadCsv}
             </a>
             <a
               className="button secondary"
               href={`/api/dashboard/pots/${id}/export?format=pdf`}
             >
-              Download PDF
+              {ui.downloadPdf}
             </a>
             <a
               className="button secondary"
               href={`/api/dashboard/pots/${id}/export?format=card`}
             >
-              Family thank-you card
+              {ui.familyThankyouCard}
             </a>
           </div>
           {pot.activity.length > 0 && (
             <>
-              <h3>Recent activity</h3>
+              <h3>{ui.recentActivity}</h3>
               {pot.activity.map((a) => (
                 <p className="helper" key={a.id}>
                   {a.action.replaceAll('_', ' ').toLowerCase()} ·{' '}

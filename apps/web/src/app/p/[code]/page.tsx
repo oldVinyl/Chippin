@@ -1,4 +1,5 @@
 'use client';
+import { ui } from '../../../copy/interface';
 import { use } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -27,10 +28,13 @@ export default function PotPage({
   if (!pot)
     return error ? (
       <section className="page narrow">
-        <h1>We couldn’t find that {terms.potLower}.</h1>
+        <h1>
+          {ui.weCouldntFindThat}
+          {terms.potLower}.
+        </h1>
         <ErrorNote message={error} />
         <Link className="button" href="/">
-          Try another code
+          {ui.tryAnotherCode}
         </Link>
       </section>
     ) : (
@@ -40,9 +44,7 @@ export default function PotPage({
     ? Math.min(100, (pot.totalMinor / pot.targetMinor) * 100)
     : 0;
   async function report() {
-    const reason = prompt(
-      'What should we look into? Please avoid sharing personal information.',
-    );
+    const reason = prompt(ui.whatShouldWeLookIntoPleaseAvoidSharing);
     if (reason && reason.length >= 10) {
       try {
         await api(`/pots/${code}/report`, {
@@ -50,7 +52,7 @@ export default function PotPage({
           headers: { 'Idempotency-Key': crypto.randomUUID() },
           body: JSON.stringify({ reason }),
         });
-        alert('Thank you. An admin will review this pot.');
+        alert(ui.thankYouAnAdminWillReviewThisPot);
       } catch (e) {
         alert((e as Error).message);
       }
@@ -60,7 +62,7 @@ export default function PotPage({
     <section className="page">
       <Link className="back" href="/">
         <ArrowLeft />
-        All together, with Chippin
+        {ui.allTogetherWithChippin}
       </Link>
       <div className="pot-layout">
         <div className="pot-info">
@@ -73,25 +75,30 @@ export default function PotPage({
               sizes="(max-width:700px) 100vw, 600px"
             />
           </div>
-          <p className="eyebrow">A LITTLE FROM ALL OF US</p>
+          <p className="eyebrow">{ui.aLittleFromAllOfUs}</p>
           <h1>{pot.name}</h1>
           <p className="verified">
-            By {pot.organizer.name}
+            {ui.by}
+            {pot.organizer.name}
             {pot.organizer.verified && (
               <>
                 <ShieldCheck size={20} weight="fill" />
-                Verified organizer
+                {ui.verifiedOrganizer}
               </>
             )}
           </p>
-          <h3>The story behind this {terms.potLower}.</h3>
+          <h3>
+            {ui.theStoryBehindThis}
+            {terms.potLower}.
+          </h3>
           <p className="story">{pot.story}</p>
           <section className="donors">
             <h3>
               {terms.donorBook}
               <span className="tag" style={{ marginLeft: 12 }}>
                 <UsersThree size={17} />
-                {pot.count} friends
+                {pot.count}
+                {ui.friends}
               </span>
             </h3>
             {pot.donors.length ? (
@@ -106,7 +113,7 @@ export default function PotPage({
                         month: 'short',
                         day: 'numeric',
                       })}
-                      {d.status === 'REFUNDED' ? ' · Refunded' : ''}
+                      {d.status === 'REFUNDED' ? ui.refunded2 : ''}
                     </time>
                   </div>
                   {d.amountMinor !== null && (
@@ -118,8 +125,8 @@ export default function PotPage({
               <div className="surface">
                 <Image src={assets.empty} width={120} height={110} alt="" />
                 <p>
-                  Be the first to put a little kindness in this {terms.potLower}
-                  .
+                  {ui.beTheFirstToPutALittleKindness}
+                  {terms.potLower}.
                 </p>
               </div>
             )}
@@ -127,17 +134,23 @@ export default function PotPage({
         </div>
         <aside className="pot-summary">
           <span className="tag">
-            {pot.demo ? 'DEMO · NO MONEY MOVES' : 'MTN SANDBOX · TEST CURRENCY'}
+            {pot.demo
+              ? ui.demoNoMoneyMoves
+              : pot.mode === 'live'
+                ? ui.momoPayments
+                : ui.mtnSandboxTestCurrency}
           </span>
-          <p className="helper">Together, you’ve raised</p>
+          <p className="helper">{ui.togetherYouveRaised}</p>
           <div className="big-total" aria-live="polite">
             {formatMoney(pot.totalMinor, pot.currency)}
           </div>
           {pot.targetMinor && (
             <>
               <p className="helper">
-                of {formatMoney(pot.targetMinor, pot.currency)} ·{' '}
-                {Math.round(progress)}% of the way
+                {ui.of}
+                {formatMoney(pot.targetMinor, pot.currency)} ·{' '}
+                {Math.round(progress)}
+                {ui.ofTheWay}
               </p>
               <div
                 className="progress"
@@ -145,17 +158,18 @@ export default function PotPage({
                 aria-valuemin={0}
                 aria-valuemax={100}
                 aria-valuenow={Math.round(progress)}
-                aria-label="Contribution target"
+                aria-label={ui.contributionTarget}
               >
                 <span style={{ width: `${progress}%` }} />
               </div>
             </>
           )}
           <p className="helper">
-            {pot.count} contributions ·{' '}
+            {pot.count}
+            {ui.contributions3}{' '}
             {pot.deadlineAt
               ? `Closes ${new Date(pot.deadlineAt).toLocaleDateString('en-GH')}`
-              : 'Every little bit helps'}
+              : ui.everyLittleBitHelps}
           </p>
           {pot.status === 'OPEN' && !pot.suspended ? (
             <Link className="button" href={`/p/${code}/pay`}>
@@ -165,10 +179,10 @@ export default function PotPage({
           ) : (
             <p className="surface">
               {pot.suspended
-                ? 'This pot is under review. Payments are paused.'
+                ? ui.thisPotIsUnderReviewPaymentsArePaused
                 : pot.status === 'REFUNDING'
-                  ? 'Refunds are being processed.'
-                  : 'This pot is closed.'}
+                  ? ui.refundsAreBeingProcessed
+                  : ui.thisPotIsClosed}
             </p>
           )}
           <p className="helper">
@@ -176,7 +190,8 @@ export default function PotPage({
             {pot.payoutAt && new Date(pot.payoutAt).toLocaleString('en-GH')}
           </p>
           <p className="helper">
-            Paid to: <strong>{pot.payoutAccountName}</strong>
+            {ui.paidTo}
+            <strong>{pot.payoutAccountName}</strong>
           </p>
           {pot.unrecovered && (
             <ErrorNote message="The organizer has not returned the paid-out funds. Chippin cannot pull money from their wallet. Refunds are waiting for recovery." />
@@ -185,7 +200,8 @@ export default function PotPage({
           <p className="helper">{copy.scam}</p>
           <button className="text-link" onClick={report}>
             <Flag size={18} />
-            Report this {terms.potLower}
+            {ui.reportThis}
+            {terms.potLower}
           </button>
         </aside>
       </div>

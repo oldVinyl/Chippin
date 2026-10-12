@@ -1,4 +1,5 @@
 'use client';
+import { ui } from '../../../../../copy/interface';
 import { use, useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -57,18 +58,18 @@ export default function PaymentStatus({
         alt=""
       />
       <p className="eyebrow" style={{ justifyContent: 'center' }}>
-        {pot?.demo ? 'DEMO PAYMENT' : 'YOUR CONTRIBUTION'}
+        {pot?.demo ? ui.demoPayment : ui.yourContribution2}
       </p>
       <h1 aria-live="polite">
         {receipt.status === 'REFUNDED'
-          ? 'Your contribution was returned.'
+          ? ui.yourContributionWasReturned
           : success
-            ? 'A little from you. A lot of love.'
+            ? ui.aLittleFromYouALotOfLove
             : failed
-              ? 'That payment didn’t go through.'
+              ? ui.thatPaymentDidntGoThrough
               : remaining
-                ? 'Check your phone.'
-                : 'We’re checking with MoMo.'}
+                ? ui.checkYourPhone
+                : ui.wereCheckingWithMomo}
       </h1>
       <p>
         {success
@@ -78,15 +79,15 @@ export default function PaymentStatus({
               'MoMo confirmed this payment did not complete. You can try again when you’re ready.'
             : remaining
               ? pot?.demo
-                ? 'No phone prompt is sent in demo mode. We’re simulating your chosen payment outcome.'
-                : 'Open the MoMo prompt on your phone, check the amount and approve there. You never enter your PIN here.'
+                ? ui.noPhonePromptIsSentInDemoMode
+                : ui.openTheMomoPromptOnYourPhoneCheck
               : copy.unknown}
       </p>
       {!success && !failed && (
         <p role="status">
           {remaining
             ? `Checking automatically · ${Math.floor(remaining / 60)}:${String(remaining % 60).padStart(2, '0')}`
-            : 'Still checking. You can return to this receipt later.'}
+            : ui.stillCheckingYouCanReturnToThisReceipt}
         </p>
       )}
       <div className="receipt">
@@ -97,26 +98,22 @@ export default function PaymentStatus({
           {receipt.status} ·{' '}
           {new Date(receipt.createdAt).toLocaleString('en-GH')}
         </p>
-        <span className="helper">Keep this reference</span>
+        <span className="helper">{ui.keepThisReference2}</span>
         <code className="reference">{receipt.reference}</code>
       </div>
       {failed ? (
         <Link className="button" href={`/p/${code}/pay`}>
-          Try again
+          {ui.tryAgain}
         </Link>
       ) : (
         <Link className="button" href={`/p/${code}`}>
-          Back to the pot
+          {ui.backToThePot}
         </Link>
       )}
       {!success && !failed && (
         <details>
-          <summary>Didn’t get a prompt?</summary>
-          <p>
-            Check that your phone has a signal, the number is right and your
-            MoMo account is active. If money left your wallet, keep this receipt
-            and wait for confirmation. Don’t give again yet.
-          </p>
+          <summary>{ui.didntGetAPrompt}</summary>
+          <p>{ui.checkThatYourPhoneHasASignalThe}</p>
         </details>
       )}
       {success && pot && <SharePanel name={pot.name} code={code} />}

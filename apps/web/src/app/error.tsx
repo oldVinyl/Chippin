@@ -1,14 +1,12 @@
 'use client';
+import { ui } from '../copy/interface';
 export default function ErrorPage({ reset }: { reset: () => void }) {
   return (
     <section className="page narrow">
-      <h1>A little hiccup.</h1>
-      <p>
-        We couldn’t load this page. If you were paying, keep your receipt
-        reference and check the status before trying another payment.
-      </p>
+      <h1>{ui.aLittleHiccup}</h1>
+      <p>{ui.weCouldntLoadThisPageIfYouWere}</p>
       <button className="button" onClick={reset}>
-        Try loading again
+        {ui.tryLoadingAgain}
       </button>
     </section>
   );
