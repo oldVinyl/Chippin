@@ -45,6 +45,25 @@ for (const name of svgFiles) {
     statSync(file).size > 200000
   )
     throw new Error(`Invalid SVG: ${file}`);
+  const meta = await sharp(file).metadata();
+  const dimensions =
+    name === 'brand/logo'
+      ? [400, 120]
+      : name === 'illustrations/hero'
+        ? [560, 500]
+        : name.startsWith('brand/')
+          ? [200, 200]
+          : name.startsWith('patterns/')
+            ? [320, 320]
+            : name.includes('how-')
+              ? [270, 230]
+              : [260, 230];
+  if (
+    meta.format !== 'svg' ||
+    meta.width !== dimensions[0] ||
+    meta.height !== dimensions[1]
+  )
+    throw new Error(`Invalid SVG dimensions: ${file}`);
 }
 for (const [name, w, h] of raster) {
   const file = `apps/web/public/images/${name}`;
@@ -57,4 +76,6 @@ for (const [name, w, h] of raster) {
   )
     throw new Error(`Invalid dimensions/format/size: ${file}`);
 }
-console.log('All 31 assets present with expected format, size and dimensions.');
+console.log(
+  `All ${svgFiles.length + raster.length} assets present with expected format, size and dimensions.`,
+);
