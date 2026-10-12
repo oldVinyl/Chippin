@@ -1,0 +1,6 @@
+pnpm-lock.yaml
+.next
+dist
+node_modules
+apps/api/prisma/migrations
+apps/web/public/images
