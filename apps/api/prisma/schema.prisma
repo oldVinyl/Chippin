@@ -237,3 +237,20 @@ model MockTransaction {
   scenario    String
   createdAt   DateTime @default(now())
 }
+model PublicRequest {
+  id String @id
+  requestHash String
+  response Json?
+  createdAt DateTime @default(now())
+}
+model TransferAttempt {
+  id String @id @default(uuid())
+  jobId String
+  kind String
+  providerReference String @unique
+  amountMinor Int
+  partyEnc String
+  status TransferStatus @default(SENT)
+  createdAt DateTime @default(now())
+  @@index([jobId, kind, createdAt])
+}
