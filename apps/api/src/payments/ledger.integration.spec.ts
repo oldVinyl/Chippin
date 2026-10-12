@@ -15,7 +15,7 @@ run('real PostgreSQL money invariants', () => {
   let contributionId: string;
   beforeAll(async () => {
     db = new Db();
-    await db.$connect();
+    await db.onModuleInit();
     payments = new PaymentsService(db, new MockProvider(db));
     const organizer = await db.organizer.create({
       data: {
@@ -167,6 +167,17 @@ run('real PostgreSQL money invariants', () => {
         },
       }),
     ).rejects.toThrow();
+  });
+  test('payment environments cannot be switched on a populated ledger', async () => {
+    const old = process.env.MOMO_MODE;
+    const other = new Db();
+    process.env.MOMO_MODE = 'sandbox';
+    try {
+      await expect(other.onModuleInit()).rejects.toThrow('bound to mock');
+    } finally {
+      process.env.MOMO_MODE = old;
+      await other.$disconnect();
+    }
   });
   test('recovery is collected before refunds and repeated jobs do not double-spend', async () => {
     const recovery = await db.recovery.findUniqueOrThrow({ where: { potId } });

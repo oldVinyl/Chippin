@@ -11,6 +11,22 @@ export class Db extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   }
   async onModuleInit() {
     await this.$connect();
+    const mode = process.env.MOMO_MODE ?? 'mock';
+    await this.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT 1 FROM pg_advisory_xact_lock(hashtext('chippin-payment-environment'))`;
+      const setting = await tx.runtimeSetting.findUnique({
+        where: { name: 'payment-mode' },
+      });
+      if (setting && setting.value !== mode)
+        throw new Error(
+          `This database is bound to ${setting.value} payments. Use a separate empty database for ${mode}; never reinterpret existing provider references.`,
+        );
+      await tx.runtimeSetting.upsert({
+        where: { name: 'payment-mode' },
+        create: { name: 'payment-mode', value: mode },
+        update: {},
+      });
+    });
   }
   async onModuleDestroy() {
     await this.$disconnect();

@@ -243,6 +243,18 @@ model PublicRequest {
   response Json?
   createdAt DateTime @default(now())
 }
+model Notification {
+  id String @id @default(uuid())
+  contributionId String @unique
+  status String @default("QUEUED")
+  attempts Int @default(0)
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+}
+model RuntimeSetting {
+  name String @id
+  value String
+}
 model TransferAttempt {
   id String @id @default(uuid())
   jobId String

@@ -198,6 +198,20 @@ export class DashboardController {
     const u = await this.auth.user(req);
     return this.pots.detail(id, u.id);
   }
+  @Sse('pots/:id/events') events(@Req() req: Request, @Param('id') id: string) {
+    return from(this.auth.user(req)).pipe(
+      switchMap(() =>
+        interval(5000).pipe(
+          switchMap(() =>
+            from(
+              this.auth.user(req).then((user) => this.pots.detail(id, user.id)),
+            ).pipe(catchError(() => of({ unavailable: true }))),
+          ),
+          switchMap((data) => of({ data })),
+        ),
+      ),
+    );
+  }
   @Post('pots') async create(@Req() req: Request, @Body() dto: PotDto) {
     const u = await this.auth.user(req, true);
     return this.pots.create(dto, u.id);
@@ -302,7 +316,7 @@ export class DashboardController {
     }
     const escape = (v: unknown) =>
       `"${String(v)
-        .replace(/^[=+@-]/, "'")
+        .replace(/^\s*[=+@-]/, "'")
         .replace(/"/g, '""')}"`;
     res.setHeader('Content-Type', 'text/csv');
     res.setHeader(
@@ -362,7 +376,9 @@ export class AdminController {
       failedPayouts: await this.db.payout.findMany({
         where: { status: { in: ['FAILED', 'UNKNOWN'] } },
       }),
-      failedRefunds: await this.db.refund.findMany({ where: { status: { in: ['FAILED','UNKNOWN'] } } }),
+      failedRefunds: await this.db.refund.findMany({
+        where: { status: { in: ['FAILED', 'UNKNOWN'] } },
+      }),
       unrecovered: await this.db.pot.findMany({
         where: { unrecovered: true },
         select: { id: true, name: true, code: true },
@@ -417,15 +433,22 @@ export class AdminController {
     await this.db.audit(u.id, 'RECONCILIATION_RUN', 'system');
     return { complete: true };
   }
-  @Post('transfers/:kind/:id/retry') async retry(@Req() req: Request,@Param('kind') kind: string,@Param('id') id: string) {
-    const user=await this.admin(req,true);
-    if(!['payout','refund'].includes(kind))throw new BadRequestException('Choose a payout or refund.');
-    const result=await this.payments.retryTransfer(kind as 'payout' | 'refund',id);
-    await this.db.audit(user.id,'TRANSFER_RETRY_REQUESTED',id,{kind});
+  @Post('transfers/:kind/:id/retry') async retry(
+    @Req() req: Request,
+    @Param('kind') kind: string,
+    @Param('id') id: string,
+  ) {
+    const user = await this.admin(req, true);
+    if (!['payout', 'refund'].includes(kind))
+      throw new BadRequestException('Choose a payout or refund.');
+    const result = await this.payments.retryTransfer(
+      kind as 'payout' | 'refund',
+      id,
+    );
+    await this.db.audit(user.id, 'TRANSFER_RETRY_REQUESTED', id, { kind });
     return result;
   }
   @Get('data-requests/:id') async data(
- 
     @Req() req: Request,
     @Param('id') id: string,
   ) {

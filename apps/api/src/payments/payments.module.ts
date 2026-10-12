@@ -3,9 +3,13 @@ import { PaymentsService } from './payments.service';
 import { PaymentProvider } from './provider';
 import { MockProvider } from './mock';
 import { MomoProvider } from './momo';
+import { AuthModule } from '../auth/auth.module';
+import { NotificationsService } from './notifications.service';
 @Module({
+  imports: [AuthModule],
   providers: [
     PaymentsService,
+    NotificationsService,
     MockProvider,
     MomoProvider,
     {

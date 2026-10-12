@@ -223,6 +223,14 @@ export class PaymentsService {
         },
       });
       if (result.status === 'SUCCESSFUL') {
+        await tx.auditLog.create({
+          data: {
+            actor: 'provider',
+            action: 'CONTRIBUTION_CONFIRMED',
+            target: c.potId,
+            metadata: { contributionId: c.id },
+          },
+        });
         await tx.ledgerEntry.create({
           data: {
             potId: c.potId,
@@ -450,6 +458,14 @@ export class PaymentsService {
         where: { providerReference: reference },
         data: { status: result.status as 'SUCCESSFUL' | 'FAILED' },
       });
+      await tx.auditLog.create({
+        data: {
+          actor: 'provider',
+          action: `${kind.toUpperCase()}_${result.status}`,
+          target: pot.id,
+          metadata: { jobId: id },
+        },
+      });
       await (txModel as any).update({
         where: { id },
         data: {
@@ -474,11 +490,17 @@ export class PaymentsService {
             refId: id,
           },
         });
-        if ('contributionId' in job)
+        if ('contributionId' in job) {
           await tx.contribution.update({
             where: { id: job.contributionId },
             data: { status: 'REFUNDED' },
           });
+          await tx.notification.upsert({
+            where: { contributionId: job.contributionId },
+            create: { contributionId: job.contributionId },
+            update: {},
+          });
+        }
       }
     });
   }
@@ -488,6 +510,14 @@ export class PaymentsService {
       const current = await tx.pot.findUniqueOrThrow({ where: { id: potId } });
       if (current.status === 'REFUNDED')
         throw new BadRequestException('This pot has already been refunded.');
+      if (
+        await tx.contribution.count({
+          where: { potId, status: 'SUCCESSFUL', msisdnEnc: null },
+        })
+      )
+        throw new BadRequestException(
+          'A contributor requested removal of their refund number. Contact support to review this case before cancelling.',
+        );
       await tx.pot.update({
         where: { id: potId },
         data: { status: 'REFUNDING', closedAt: current.closedAt ?? new Date() },
@@ -525,17 +555,32 @@ export class PaymentsService {
     });
   }
   async retryTransfer(kind: 'payout' | 'refund', id: string) {
-    const job=kind==='payout'?await this.db.payout.findUnique({where:{id}}):await this.db.refund.findUnique({where:{id},include:{contribution:true}});
-    if(!job||job.status!=='FAILED')throw new BadRequestException('Only a confirmed failed job can be retried. Unknown outcomes must be reconciled.');
-    const potId='potId' in job?job.potId:job.contribution.potId;
-    return this.db.$transaction(async tx=>{
-      await lockPot(tx,potId);
-      if(await balance(tx,potId)<job.amountMinor)throw new BadRequestException('There are not enough unreserved funds to retry this job.');
-      const model=kind==='payout'?tx.payout:tx.refund;
-      const current=await (model as any).findUnique({where:{id}});
-      if(current.status!=='FAILED')return {queued:true};
-      await (model as any).update({where:{id},data:{status:'QUEUED',nextAttemptAt:new Date(),lastError:null}});
-      return {queued:true};
+    const job =
+      kind === 'payout'
+        ? await this.db.payout.findUnique({ where: { id } })
+        : await this.db.refund.findUnique({
+            where: { id },
+            include: { contribution: true },
+          });
+    if (!job || job.status !== 'FAILED')
+      throw new BadRequestException(
+        'Only a confirmed failed job can be retried. Unknown outcomes must be reconciled.',
+      );
+    const potId = 'potId' in job ? job.potId : job.contribution.potId;
+    return this.db.$transaction(async (tx) => {
+      await lockPot(tx, potId);
+      if ((await balance(tx, potId)) < job.amountMinor)
+        throw new BadRequestException(
+          'There are not enough unreserved funds to retry this job.',
+        );
+      const model = kind === 'payout' ? tx.payout : tx.refund;
+      const current = await (model as any).findUnique({ where: { id } });
+      if (current.status !== 'FAILED') return { queued: true };
+      await (model as any).update({
+        where: { id },
+        data: { status: 'QUEUED', nextAttemptAt: new Date(), lastError: null },
+      });
+      return { queued: true };
     });
   }
   async queueRefunds(potId: string) {
