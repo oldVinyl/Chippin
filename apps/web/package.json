@@ -1,1 +1,30 @@
-{"name":"@chippin/web","private":true,"scripts":{"dev":"next dev --hostname 0.0.0.0","build":"next build","start":"next start --hostname 0.0.0.0","typecheck":"tsc --noEmit"},"dependencies":{"@chippin/shared":"workspace:*","next":"^15.5.9","react":"^19.1.0","react-dom":"^19.1.0","@phosphor-icons/react":"^2.1.10","qrcode":"^1.5.4","@fontsource/fredoka":"^5.2.8","@fontsource/nunito":"^5.2.8"},"devDependencies":{"@types/node":"^22.18.0","@types/react":"^19.1.0","@types/react-dom":"^19.1.0","@types/qrcode":"^1.5.5","tailwindcss":"^4.1.13","@tailwindcss/postcss":"^4.1.13","typescript":"^5.9.3"}}
+{
+  "name": "@chippin/web",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --hostname 0.0.0.0",
+    "build": "next build",
+    "start": "next start --hostname 0.0.0.0",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@chippin/shared": "workspace:*",
+    "@fontsource/fredoka": "^5.2.8",
+    "@fontsource/nunito": "^5.2.8",
+    "@phosphor-icons/react": "^2.1.10",
+    "next": "^15.5.9",
+    "qrcode": "^1.5.4",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "sharp": "^0.35.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.13",
+    "@types/node": "^22.18.0",
+    "@types/qrcode": "^1.5.5",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "tailwindcss": "^4.1.13",
+    "typescript": "^5.9.3"
+  }
+}
