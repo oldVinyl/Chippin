@@ -20,6 +20,7 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
       - run: pnpm exec tsx scripts/local-setup.ts
       - run: pnpm db:generate && pnpm db:deploy && pnpm seed
       - run: pnpm test && pnpm contrast:check && pnpm assets:check
