@@ -1,0 +1,239 @@
+generator client {
+  provider = "prisma-client-js"
+  engineType = "client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum VerificationStatus {
+  UNVERIFIED
+  PENDING
+  VERIFIED
+  SUSPENDED
+}
+
+enum PotStatus {
+  DRAFT
+  OPEN
+  CLOSED
+  CANCELLED
+  REFUNDING
+  REFUNDED
+}
+
+enum PayoutMode {
+  INSTANT
+  SCHEDULED
+  ON_CLOSE
+}
+
+enum ContributionStatus {
+  CREATED
+  PENDING
+  SUCCESSFUL
+  FAILED
+  EXPIRED
+  REFUNDED
+}
+
+enum TransferStatus {
+  QUEUED
+  SENT
+  SUCCESSFUL
+  FAILED
+  UNKNOWN
+}
+
+enum LedgerType {
+  CONTRIBUTION
+  FEE
+  PAYOUT
+  PAYOUT_REVERSAL
+  REFUND
+  RECOVERY
+}
+
+model Organizer {
+  id                 String             @id @default(uuid())
+  name               String
+  email              String             @unique
+  phoneEnc           String
+  phoneHash          String             @unique
+  passwordHash       String
+  phoneVerifiedAt    DateTime?
+  verificationStatus VerificationStatus @default(UNVERIFIED)
+  isAdmin            Boolean            @default(false)
+  createdAt          DateTime           @default(now())
+  pots               Pot[]
+  sessions           Session[]
+  otp                Otp?
+}
+
+model Session {
+  id          String    @id
+  organizerId String
+  organizer   Organizer @relation(fields: [organizerId], references: [id])
+  csrf        String
+  expiresAt   DateTime
+}
+
+model Otp {
+  organizerId String    @id
+  organizer   Organizer @relation(fields: [organizerId], references: [id])
+  hash        String
+  expiresAt   DateTime
+  attempts    Int       @default(0)
+}
+
+model Pot {
+  id                   String         @id @default(uuid())
+  code                 String         @unique
+  slug                 String
+  name                 String
+  story                String
+  cover                Int            @default(1)
+  organizerId          String
+  organizer            Organizer      @relation(fields: [organizerId], references: [id])
+  targetMinor          Int?
+  deadlineAt           DateTime?
+  status               PotStatus      @default(OPEN)
+  suspended            Boolean        @default(false)
+  payoutMode           PayoutMode     @default(ON_CLOSE)
+  payoutAt             DateTime?
+  payoutMsisdnEnc      String
+  payoutAccountName    String
+  payoutLocked         Boolean        @default(false)
+  showAmountsPublicly  Boolean        @default(true)
+  allowAnonymous       Boolean        @default(true)
+  minContributionMinor Int            @default(100)
+  thankYouMessage      String         @default("Thank you for showing up for us. Every contribution matters.")
+  createdAt            DateTime       @default(now())
+  closedAt             DateTime?
+  unrecovered          Boolean        @default(false)
+  contributions        Contribution[]
+  payouts              Payout[]
+  ledger               LedgerEntry[]
+  recovery             Recovery?
+}
+
+model Contribution {
+  id                String             @id @default(uuid())
+  potId             String
+  pot               Pot                @relation(fields: [potId], references: [id])
+  displayName       String?
+  message           String?
+  isAnonymous       Boolean            @default(false)
+  msisdnEnc         String?
+  msisdnHash        String?
+  network           String
+  amountMinor       Int
+  feeMinor          Int                @default(0)
+  providerReference String             @unique
+  idempotencyKey    String             @unique
+  requestHash       String
+  scenario          String             @default("success")
+  status            ContributionStatus @default(CREATED)
+  failureReason     String?
+  providerTxnId     String?
+  consentAt         DateTime
+  consentVersion    String
+  createdAt         DateTime           @default(now())
+  settledAt         DateTime?
+  lastCheckedAt     DateTime?
+  refund            Refund?
+
+  @@index([status, lastCheckedAt])
+  @@index([potId, msisdnHash, createdAt])
+}
+
+model Payout {
+  id                String         @id @default(uuid())
+  potId             String
+  pot               Pot            @relation(fields: [potId], references: [id])
+  amountMinor       Int
+  providerReference String         @unique
+  status            TransferStatus @default(QUEUED)
+  attempts          Int            @default(0)
+  lastError         String?
+  nextAttemptAt     DateTime       @default(now())
+  createdAt         DateTime       @default(now())
+}
+
+model Refund {
+  id                String         @id @default(uuid())
+  contributionId    String         @unique
+  contribution      Contribution   @relation(fields: [contributionId], references: [id])
+  amountMinor       Int
+  providerReference String         @unique
+  status            TransferStatus @default(QUEUED)
+  attempts          Int            @default(0)
+  reason            String
+  lastError         String?
+  nextAttemptAt     DateTime       @default(now())
+  createdAt         DateTime       @default(now())
+}
+
+model Recovery {
+  id                String             @id @default(uuid())
+  potId             String             @unique
+  pot               Pot                @relation(fields: [potId], references: [id])
+  amountMinor       Int
+  providerReference String             @unique
+  status            ContributionStatus @default(CREATED)
+  expiresAt         DateTime
+  createdAt         DateTime           @default(now())
+}
+
+model LedgerEntry {
+  id          String     @id @default(uuid())
+  potId       String
+  pot         Pot        @relation(fields: [potId], references: [id])
+  type        LedgerType
+  amountMinor Int
+  refType     String
+  refId       String
+  createdAt   DateTime   @default(now())
+
+  @@unique([type, refType, refId])
+  @@index([potId])
+}
+
+model AuditLog {
+  id       String   @id @default(uuid())
+  actor    String
+  action   String
+  target   String
+  metadata Json     @default("{}")
+  at       DateTime @default(now())
+}
+
+model Report {
+  id        String   @id @default(uuid())
+  potCode   String
+  reason    String
+  resolved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model DataRequest {
+  id        String   @id @default(uuid())
+  emailEnc  String
+  phoneHash String
+  kind      String
+  details   String
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now())
+}
+
+model MockTransaction {
+  reference   String   @id
+  amountMinor Int
+  partyEnc    String
+  partyHash   String
+  kind        String
+  scenario    String
+  createdAt   DateTime @default(now())
+}
