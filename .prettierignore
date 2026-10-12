@@ -1,5 +1,6 @@
 pnpm-lock.yaml
 .next
+.next-dev
 dist
 node_modules
 apps/api/prisma/migrations
